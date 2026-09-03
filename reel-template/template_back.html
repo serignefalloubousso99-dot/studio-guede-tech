@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1080px; height:1920px; overflow:hidden; font-family:'Segoe UI', Arial, sans-serif; }
+  .canvas {
+    width:1080px; height:1920px;
+    position:relative;
+    background: #ffffff;
+  }
+  .border-frame {
+    position:absolute; inset:22px;
+    border:1px solid rgba(11,59,96,0.16);
+    border-radius:26px;
+  }
+  .glow-blue {
+    position:absolute; top:-160px; right:-160px; width:420px; height:420px;
+    border-radius:999px;
+    background: radial-gradient(circle, rgba(11,59,96,0.08) 0%, rgba(11,59,96,0) 70%);
+  }
+  .glow-gold {
+    position:absolute; bottom:-160px; left:-160px; width:420px; height:420px;
+    border-radius:999px;
+    background: radial-gradient(circle, rgba(212,175,55,0.12) 0%, rgba(212,175,55,0) 70%);
+  }
+
+  .brand {
+    position:absolute; top:36px; left:0; right:0;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .brand img { width:150px; height:150px; object-fit:contain; display:block; }
+  .brand .name {
+    margin-top:12px;
+    font-size:50px; font-weight:800; letter-spacing:0.01em;
+    color:#0B3B60; line-height:1.05;
+  }
+  .brand .tag {
+    margin-top:10px;
+    font-size:17px; font-weight:700; letter-spacing:0.13em;
+    color:#D4AF37; text-transform:uppercase; line-height:1;
+  }
+
+  .section-divider {
+    position:absolute; top:298px; left:0; right:0;
+    display:flex; align-items:center; justify-content:center; gap:14px;
+  }
+  .section-divider .bar { width:56px; height:3px; background:#D4AF37; border-radius:2px; }
+  .section-divider .dot { width:7px; height:7px; border-radius:999px; background:#0B3B60; }
+
+  .project {
+    position:absolute; top:320px; left:0; right:0;
+    text-align:center;
+  }
+  .project .eyebrow {
+    display:inline-block;
+    background:#0B3B60;
+    color:#ffffff;
+    font-size:16px; font-weight:800; letter-spacing:0.05em;
+    text-transform:uppercase; line-height:1;
+    padding:10px 26px;
+    border-radius:999px;
+  }
+  .project .title {
+    margin-top:14px;
+    font-size:44px; font-weight:800; color:#0B3B60;
+    letter-spacing:0.01em; line-height:1.1;
+    padding:0 60px;
+  }
+  .project .title-underline {
+    width:80px; height:4px; background:#D4AF37; border-radius:2px;
+    margin:10px auto 0;
+  }
+
+  .contact {
+    position:absolute; left:0; right:0; bottom:44px;
+    text-align:center;
+  }
+  .contact .domain {
+    font-size:32px; font-weight:800; color:#D4AF37; letter-spacing:0.02em;
+  }
+  .contact .row {
+    margin-top:10px;
+    font-size:16px; font-weight:600; color:#334155;
+    letter-spacing:0.02em;
+  }
+  .contact .row span.sep { color:#D4AF37; margin:0 12px; }
+  .contact .divider {
+    width:110px; height:3px; background:#D4AF37; margin:14px auto 0; border-radius:2px;
+  }
+</style></head>
+<body>
+  <div class="canvas">
+    <div class="glow-blue"></div>
+    <div class="glow-gold"></div>
+    <div class="border-frame"></div>
+    <div class="brand">
+      <img src="file:///__LOGO_MARK_PATH__" />
+      <div class="name">GUÉDÉ TECH</div>
+      <div class="tag">Bâtissons votre avenir numérique</div>
+    </div>
+    <div class="section-divider">
+      <div class="bar"></div>
+      <div class="dot"></div>
+      <div class="bar"></div>
+    </div>
+    <div class="project">
+      <div class="eyebrow">Un projet réalisé par Guédé Tech</div>
+      <div class="title">__PROJECT_NAME__</div>
+      <div class="title-underline"></div>
+    </div>
+    <div class="contact">
+      <div class="divider"></div>
+      <div class="domain">guedetech.com</div>
+      <div class="row">+221 70 920 45 70 <span class="sep">&#183;</span> guedetech@gmail.com</div>
+    </div>
+  </div>
+</body></html>

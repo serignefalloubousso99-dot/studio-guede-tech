@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1080px; height:1920px; overflow:hidden; font-family:'Segoe UI', Arial, sans-serif; }
+  .canvas {
+    width:1080px; height:1920px;
+    position:relative;
+    background: #ffffff;
+  }
+  .border-frame {
+    position:absolute; inset:22px;
+    border:1px solid rgba(11,59,96,0.16);
+    border-radius:26px;
+  }
+  .glow-blue {
+    position:absolute; top:-160px; right:-160px; width:460px; height:460px;
+    border-radius:999px;
+    background: radial-gradient(circle, rgba(11,59,96,0.09) 0%, rgba(11,59,96,0) 70%);
+  }
+  .glow-gold {
+    position:absolute; bottom:-160px; left:-160px; width:460px; height:460px;
+    border-radius:999px;
+    background: radial-gradient(circle, rgba(212,175,55,0.13) 0%, rgba(212,175,55,0) 70%);
+  }
+
+  .el { position:absolute; left:0; right:0; text-align:center; }
+
+  #logo { top:525px; display:flex; justify-content:center; }
+  #logo img { width:250px; height:250px; object-fit:contain; }
+
+  #name { top:805px; font-size:68px; font-weight:800; color:#0B3B60; letter-spacing:0.01em; }
+
+  #tag { top:893px; font-size:22px; font-weight:700; letter-spacing:0.14em; color:#D4AF37; text-transform:uppercase; }
+
+  #divider { top:951px; display:flex; align-items:center; justify-content:center; gap:16px; }
+  #divider .bar { width:70px; height:3px; background:#D4AF37; border-radius:2px; }
+  #divider .dot { width:9px; height:9px; border-radius:999px; background:#0B3B60; }
+
+  #cta-eyebrow { top:1031px; font-size:24px; font-weight:700; color:#334155; letter-spacing:0.01em; }
+
+  #cta-button { top:1091px; display:flex; justify-content:center; }
+  #cta-button .pill {
+    display:inline-flex; align-items:center; gap:14px;
+    background:#D4AF37;
+    color:#0B3B60;
+    font-size:36px; font-weight:800; letter-spacing:0.01em;
+    padding:26px 52px;
+    border-radius:999px;
+    box-shadow: 0 18px 34px -12px rgba(212,175,55,0.55);
+  }
+  #cta-button .pill .arrow {
+    font-size:32px; font-weight:800;
+  }
+
+  #contact { top:1251px; }
+  #contact .divider2 { width:120px; height:3px; background:#0B3B60; opacity:0.18; margin:0 auto 34px; border-radius:2px; }
+  #contact .domain { font-size:48px; font-weight:800; color:#0B3B60; letter-spacing:0.02em; }
+  #contact .row { margin-top:20px; font-size:24px; font-weight:600; color:#64748b; letter-spacing:0.01em; }
+  #contact .row span.sep { color:#D4AF37; margin:0 14px; }
+</style></head>
+<body>
+  <div class="canvas">
+    <div class="glow-blue"></div>
+    <div class="glow-gold"></div>
+    <div class="border-frame"></div>
+
+    <div id="logo" class="el"><img src="file:///__LOGO_MARK_PATH__" /></div>
+    <div id="name" class="el">GUÉDÉ TECH</div>
+    <div id="tag" class="el">Bâtissons votre avenir numérique</div>
+    <div id="divider" class="el">
+      <div class="bar"></div><div class="dot"></div><div class="bar"></div>
+    </div>
+    <div id="cta-eyebrow" class="el">Un projet en tête&nbsp;?</div>
+    <div id="cta-button" class="el">
+      <div class="pill">Contactez-nous <span class="arrow">&#8594;</span></div>
+    </div>
+    <div id="contact" class="el">
+      <div class="divider2"></div>
+      <div class="domain">guedetech.com</div>
+      <div class="row">+221 70 920 45 70 <span class="sep">&#183;</span> guedetech@gmail.com</div>
+    </div>
+  </div>
+</body></html>
