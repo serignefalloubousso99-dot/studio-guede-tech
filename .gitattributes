@@ -1,0 +1,5 @@
+# Force LF line endings regardless of a clone's core.autocrlf setting.
+# These are POSIX shell scripts — a CRLF shebang line ("#!/bin/bash\r")
+# fails with "bad interpreter" on real Linux/macOS bash, even though Git
+# Bash on Windows tolerates it.
+*.sh text eol=lf
