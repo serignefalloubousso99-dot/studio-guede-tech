@@ -26,20 +26,33 @@
 
 set -e
 
+# Optional first argument selects the aspect ratio:
+#   ./make_outro.sh        -> 1080x1920 (9:16) -> Outro_GuedeTech.mp4
+#   ./make_outro.sh 16x9   -> 1920x1080 (16:9) -> Outro_GuedeTech_16x9.mp4
+# The 16:9 card is the YouTube counterpart used by ../tuto-pipeline. Both
+# masters carry the same seven element ids and the same reveal timing, so
+# everything below is shared — only the canvas size and file names change.
+VARIANT="$1"
+case "$VARIANT" in
+  16x9) W=1920; H=1080; SUFFIX="_16x9" ;;
+  "")   W=1080; H=1920; SUFFIX="" ;;
+  *)    echo "Usage: ./make_outro.sh [16x9]" >&2; exit 1 ;;
+esac
+
 DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$DIR/../find_chrome.sh"
 
-node "$DIR/split_outro_layers.js"
+node "$DIR/split_outro_layers.js" $VARIANT
 
 "$CHROME" --headless --disable-gpu --no-sandbox --hide-scrollbars \
-  --force-device-scale-factor=1 --window-size=1080,1920 \
-  --screenshot="$DIR/L_background.png" "file:///$DIR/layer_background.html"
+  --force-device-scale-factor=1 --window-size=$W,$H \
+  --screenshot="$DIR/L_background.png" "file:///$DIR/layer_background$SUFFIX.html"
 
 for id in logo name tag divider cta-eyebrow cta-button contact; do
   "$CHROME" --headless --disable-gpu --no-sandbox --hide-scrollbars \
     --force-device-scale-factor=1 --default-background-color=00000000 \
-    --window-size=1080,1920 \
-    --screenshot="$DIR/L_${id}.png" "file:///$DIR/layer_${id}.html"
+    --window-size=$W,$H \
+    --screenshot="$DIR/L_${id}.png" "file:///$DIR/layer_${id}$SUFFIX.html"
 done
 
 # Fade-in timing table (seconds): [start, duration] per element, staggered
@@ -80,7 +93,7 @@ ffmpeg -y \
     [s7]fade=t=out:st=5.3:d=0.7:color=white,format=yuv420p[out]
   " \
   -map "[out]" -r 30 -c:v libx264 -preset medium -crf 18 -t 6 \
-  "$DIR/Outro_GuedeTech.mp4"
+  "$DIR/Outro_GuedeTech$SUFFIX.mp4"
 
 rm -f "$DIR"/L_*.png "$DIR"/layer_*.html
-echo "Done -> $DIR/Outro_GuedeTech.mp4"
+echo "Done -> $DIR/Outro_GuedeTech$SUFFIX.mp4"

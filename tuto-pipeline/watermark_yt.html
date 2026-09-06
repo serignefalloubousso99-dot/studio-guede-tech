@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1920px; height:1080px; overflow:hidden; background:transparent;
+              font-family:'Segoe UI', Arial, sans-serif; }
+  .canvas { width:1920px; height:1080px; position:relative; }
+
+  /* Bottom-right corner bug. Sits on a translucent white pill rather than
+     directly on the frame: a screencast cuts between a dark editor and a
+     light browser, and flat navy text would vanish against the former while
+     flat white text would vanish against the latter. The pill keeps one
+     fixed contrast ratio whatever is underneath. */
+  .bug {
+    position:absolute;
+    display:flex; align-items:center; gap:14px;
+    background: rgba(255,255,255,0.90);
+    border: 1px solid rgba(11,59,96,0.10);
+    border-radius:999px;
+    padding:12px 26px 12px 14px;
+    box-shadow: 0 10px 26px -10px rgba(11,59,96,0.45);
+  }
+  /* Which corner the bug sits in. Default is bottom-left: an OBS scene
+     usually parks the webcam inset bottom-right, and a logo laid over the
+     presenter's face is the one placement that always looks like a mistake. */
+  .pos-bl { left:44px;  bottom:40px; }
+  .pos-br { right:44px; bottom:40px; }
+  .pos-tl { left:44px;  top:36px; }
+  .pos-tr { right:44px; top:36px; }
+
+  .bug img { width:54px; height:54px; object-fit:contain; display:block; }
+  .bug .text { display:flex; flex-direction:column; line-height:1; }
+  .bug .name {
+    font-size:26px; font-weight:800; color:#0B3B60; letter-spacing:0.02em;
+  }
+  .bug .site {
+    margin-top:7px;
+    font-size:15px; font-weight:700; color:#D4AF37; letter-spacing:0.09em;
+    text-transform:uppercase;
+  }
+</style></head>
+<body>
+  <div class="canvas">
+    <div class="bug __WM_POS__">
+      <img src="file:///__LOGO_MARK_PATH__" />
+      <div class="text">
+        <div class="name">GUÉDÉ TECH</div>
+        <div class="site">guedetech.com</div>
+      </div>
+    </div>
+  </div>
+</body></html>

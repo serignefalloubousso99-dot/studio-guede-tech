@@ -1,20 +1,28 @@
-// Splits outro_master.html into one transparent-background PNG-ready HTML
-// file per animated element (plus one opaque background layer), all sharing
-// the exact same absolute positions from the master file. This lets ffmpeg
-// fade/overlay each element independently to build the staggered reveal.
+// Splits an outro master HTML file into one transparent-background PNG-ready
+// HTML file per animated element (plus one opaque background layer), all
+// sharing the exact same absolute positions from the master file. This lets
+// ffmpeg fade/overlay each element independently to build the staggered
+// reveal.
 //
-// Run via make_outro.sh (which also does the Chrome screenshot + ffmpeg
-// composite steps). Requires Node.js only for this step.
+// Usage (run via make_outro.sh, which also does the Chrome screenshot +
+// ffmpeg composite steps):
+//   node split_outro_layers.js          -> outro_master.html      -> layer_<id>.html
+//   node split_outro_layers.js 16x9     -> outro_master_16x9.html -> layer_<id>_16x9.html
+//
+// Both masters carry the same seven element ids, so one splitter serves
+// both aspect ratios — only the file names differ.
 
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const DIR = path.dirname(fileURLToPath(import.meta.url));
+const VARIANT = process.argv[2] || '';
+const SUFFIX = VARIANT ? `_${VARIANT}` : '';
 const LOGO_MARK_PATH = path.join(DIR, '..', 'assets', 'logo-mark.png').replace(/\\/g, '/');
 
 const master = fs
-  .readFileSync(path.join(DIR, 'outro_master.html'), 'utf8')
+  .readFileSync(path.join(DIR, `outro_master${SUFFIX}.html`), 'utf8')
   .replaceAll('__LOGO_MARK_PATH__', LOGO_MARK_PATH);
 
 const elementIds = ['logo', 'name', 'tag', 'divider', 'cta-eyebrow', 'cta-button', 'contact'];
@@ -34,7 +42,7 @@ function makeVariant(targetId) {
 }
 
 for (const id of elementIds) {
-  fs.writeFileSync(path.join(DIR, `layer_${id}.html`), makeVariant(id));
+  fs.writeFileSync(path.join(DIR, `layer_${id}${SUFFIX}.html`), makeVariant(id));
 }
 
 // background-only variant: opaque white canvas with border-frame + glows,
@@ -42,6 +50,6 @@ for (const id of elementIds) {
 const bgCss = `<style>
   ${elementIds.map((id) => `#${id} { visibility: hidden !important; }`).join('\n')}
 </style></head>`;
-fs.writeFileSync(path.join(DIR, 'layer_background.html'), master.replace('</head>', bgCss));
+fs.writeFileSync(path.join(DIR, `layer_background${SUFFIX}.html`), master.replace('</head>', bgCss));
 
-console.log('layers written:', elementIds.join(', '), '+ background');
+console.log('layers written:', elementIds.join(', '), '+ background', VARIANT ? `(${VARIANT})` : '');

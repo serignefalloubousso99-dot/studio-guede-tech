@@ -1,9 +1,13 @@
 # Guédé Tech — Studio
 
-Reference implementation for Guédé Tech's social media video pipeline:
-turning a raw phone screen recording of a project into a finished,
-branded vertical video (1080x1920 — TikTok / Instagram Reels & Stories),
-ready to post.
+Reference implementation for Guédé Tech's social media video pipelines.
+Two of them, sharing one brand system, one set of assets and one end card:
+
+- **`reel-template/`** — a phone screen recording of a *client project*
+  becomes a branded vertical showcase (1080x1920).
+- **`tuto-pipeline/`** — an OBS screen recording of a *coding session*
+  becomes a finished tutorial, published in both formats at once:
+  1920x1080 for YouTube and 1080x1920 for TikTok / Reels / Shorts.
 
 This is **not** part of the guedetech.com website build — it never gets
 deployed. It's a standalone command-line toolkit that happens to live in
@@ -24,6 +28,21 @@ outputs a single MP4:
    appended: logo → name → tagline → "Un projet en tête ?" →
    "Contactez-nous" button → contact info, each fading in in sequence,
    then fading to white.
+
+Given an OBS recording of a coding session and a tutorial title, the
+tuto pipeline outputs **two** MP4s from that single capture:
+
+1. **The YouTube cut** (1920x1080) — the capture, picture and sound
+   enhanced, with a corner watermark, then the 16:9 end card appended.
+2. **The vertical cut** (1080x1920) — the same capture seated inside a
+   macOS-window mockup on the branded vertical layout (logo, title,
+   optional hook line, contact block), then the 9:16 end card appended.
+
+Both carry identical treatment: sharpening tuned for on-screen text, a
+small contrast/saturation lift, and an audio chain of rumble filter →
+spectral noise reduction → compression → loudness normalisation to
+-14 LUFS, the level YouTube and TikTok both target (hit it yourself and
+neither platform re-adjusts your upload).
 
 ## Prerequisites
 
@@ -56,11 +75,19 @@ studio/
 │   ├── gen_frame.js               <- generates the iPhone bezel frame (frame.png) from SVG
 │   ├── frame.png                  <- the generated iPhone frame (transparent, ready to use)
 │   └── make_reel.sh               <- input video + project name -> one reel MP4
+├── tuto-pipeline/
+│   ├── template_tuto_back.html   <- branded 9:16 background (logo/title/hook/contact)
+│   ├── watermark_yt.html          <- the 16:9 corner watermark, position-switchable
+│   ├── gen_window_frame.js        <- generates the macOS-window bezel (window_frame.png)
+│   ├── window_frame.png           <- the generated window frame (transparent, ready to use)
+│   └── make_tuto.sh               <- OBS capture + title -> YouTube MP4 + TikTok MP4
 └── outro/
     ├── outro_master.html          <- the outro's full layout (all 7 elements, final positions)
-    ├── split_outro_layers.js      <- splits the master into 7 per-element transparent PNGs
-    ├── make_outro.sh               <- regenerates Outro_GuedeTech.mp4 from the HTML
-    └── Outro_GuedeTech.mp4         <- the final rendered 6s outro clip, ready to use
+    ├── outro_master_16x9.html     <- the same end card re-flowed for 1920x1080
+    ├── split_outro_layers.js      <- splits a master into 7 per-element transparent PNGs
+    ├── make_outro.sh               <- regenerates either outro clip from its HTML
+    ├── Outro_GuedeTech.mp4         <- the rendered 6s end card, 1080x1920
+    └── Outro_GuedeTech_16x9.mp4    <- the rendered 6s end card, 1920x1080
 ```
 
 ## Quick start — produce one finished video
@@ -76,11 +103,31 @@ cd ..
 you don't need to regenerate it per project, only if you want to change
 the outro's text/design (see `outro/make_outro.sh`).
 
+## Quick start — publish one tutorial
+
+```bash
+cd studio/tuto-pipeline
+./make_tuto.sh ~/Movies/capture.mp4 "Créer une API REST en Node.js" \
+  -s "Les 3 erreurs que font 90% des débutants"
+```
+
+Writes `out/creer-une-api-rest-en-node-js-youtube.mp4` (1920x1080) and
+`out/creer-une-api-rest-en-node-js-tiktok.mp4` (1080x1920), each with the
+matching end card already appended. Both are ready to upload as-is.
+
+`-s` is the optional hook line printed under the title on the vertical
+layout only — it is the sentence that has to stop a thumb, so it is worth
+writing separately from the title. `./make_tuto.sh --help` lists the rest
+(`--only`, `--no-outro`, `--filigrane`, `--denoise`, `--hq`).
+
 ## Design system
 
-- **Canvas**: always 1080x1920 (9:16). Every template targets this
-  exact size — it's the native TikTok/Reels/Stories format, so no
-  platform-side cropping happens on upload.
+- **Canvas**: 1080x1920 (9:16) for everything vertical — the native
+  TikTok/Reels/Stories format, so no platform-side cropping happens on
+  upload — plus 1920x1080 (16:9) for the two YouTube-facing pieces (the
+  tuto pipeline's landscape cut and `outro_master_16x9.html`). A template
+  targets one of those two sizes exactly; nothing is ever authored at an
+  in-between size and rescaled.
 - **Colors**: brand navy `#0B3B60`, brand gold `#D4AF37`, white `#ffffff`
   background, muted slate `#334155`/`#64748b` for secondary text. These
   are the same values used on guedetech.com (see `src/routes/__root.tsx`
@@ -167,6 +214,61 @@ times are ~0.25-0.3s apart (see the timing table inside `make_outro.sh`)
 so it reads as a deliberate reveal sequence rather than a single flash.
 A final `fade=t=out:...:color=white` on the fully-composited output
 fades the whole scene to white in the last 0.7s for a clean end.
+
+## How the tutorial pipeline works (`tuto-pipeline/`)
+
+Same two building blocks as the reel — a Chrome-rendered background and an
+evenodd SVG ring composited over an unmasked video — pointed at a different
+problem: an OBS capture is 16:9, and a tutorial has to ship to a landscape
+platform and a portrait one from that single take.
+
+**The landscape cut** is the capture itself: enhanced, watermarked, end card
+appended. `watermark_yt.html` renders a corner "bug" — logo mark, name,
+domain — onto a translucent white pill. The pill is not decoration: a
+screencast cuts between a dark editor and a light browser, so flat navy text
+would vanish against the first and flat white text against the second, while
+the pill holds one fixed contrast ratio whatever passes underneath. It
+defaults to the **bottom-left** corner because an OBS scene usually parks its
+webcam inset bottom-right, and a logo laid over the presenter's face is the
+one placement that always reads as a mistake; `--filigrane br|tl|tr` moves it.
+
+**The vertical cut** seats that same 16:9 footage inside a macOS-window
+mockup on the branded portrait layout. `gen_window_frame.js` is
+`gen_frame.js`'s landscape sibling: one evenodd path (rounded outer rect
+minus the video hole) plus three traffic lights and a gold hairline under the
+title bar. The title bar is baked into the same PNG rather than kept separate
+— it only ever renders against the background, never over the video, so it
+costs nothing to include. Geometry is `OUTER = {x:20, y:806, w:1040, h:628}`
+with a 44px title bar and a 14px bezel, giving `INNER = {x:34, y:850, w:1012,
+h:570}`; as in the reel template those numbers are hand-carried into
+`make_tuto.sh`'s `scale`/`crop`/`overlay` arguments.
+
+Why a window mockup at all, rather than cropping 16:9 down to 9:16: cropping
+throws away two thirds of the horizontal pixels, which on a code editor means
+throwing away the code. Letterboxing the full frame keeps every character and
+turns the leftover space into brand surface — logo and title above, contact
+block below — instead of black bars.
+
+**One encode per output.** Enhancement, compositing and the end-card join all
+live in a single `filter_complex` per platform, so the footage is encoded
+once rather than written to an intermediate file and read back. That is the
+one deliberate departure from `make_reel.sh` + `append_outro.sh`'s two-step
+shape: a tutorial is minutes long where a reel is seconds, and on modest
+hardware the extra pass is the difference between a coffee and an afternoon.
+For the same reason the default is `-preset veryfast -crf 20`, with `--hq`
+switching to `medium`/CRF 18; screen content is cheap to encode and the
+faster preset costs very little visible quality. Setting `ENCODER=` in the
+environment (e.g. `h264_videotoolbox` on macOS) swaps in a hardware encoder.
+
+**Audio.** `afftdn` learns the noise profile from the quietest passages and
+subtracts it spectrally, which removes a fan or an air conditioner without
+the underwater artefacts a plain gate produces. `acompressor` then lifts the
+quiet half of the delivery *before* `loudnorm` sets the absolute level, so
+the -14 LUFS target is met by evening the voice out rather than by amplifying
+the room along with it. A capture whose audio sources were all muted in OBS
+has no audio stream at all, which would abort the run when the filter graph
+maps `[0:a]`; the script probes for one with `ffprobe` and substitutes
+silence of the right duration when it is missing.
 
 ## Joining reel + outro (`append_outro.sh`)
 

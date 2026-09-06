@@ -1,0 +1,11 @@
+# Rendered outputs — regenerate them, never commit them.
+out/
+
+# Intermediates written by the scripts and cleaned up on success; listed so a
+# run interrupted midway doesn't leave the tree dirty.
+_tmp_*.html
+_tmp_*.png
+reel_frame.html
+window_frame.html
+layer_*.html
+L_*.png
